@@ -52,9 +52,7 @@ warnings.filterwarnings('ignore')
 
 
   
-    '''
-    Importing the dataset.
-    '''
+   
 df = pd.read_csv("LaptopPrice_Dataset.csv")
 
 
@@ -496,3 +494,4 @@ webapp = gd.Interface(fn = predict, inputs = [brand, product, processortype, pro
     '''
 webapp.launch(share = 'True')
 ______________________________________________END_____________________________________________
+
