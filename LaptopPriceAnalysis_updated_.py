@@ -56,31 +56,13 @@ warnings.filterwarnings('ignore')
 df = pd.read_csv("LaptopPrice_Dataset.csv")
 
 
-    '''
-    The main goal of this project is to help predicting the price of laptops
-    based on its configurations. Regarding this point, it is noticed in the
-    dataset entries lots of information, which will be solved with feature
-    engineering on the following steps.
-    '''
-
-
-    '''
-    Presenting the columns of the dataset.
-    '''
 df.columns
 
 
-    '''
-    Dropping the first column due to its irrelevance in our analysis.
-    '''
 df = df.drop(['Unnamed: 0'], axis = 1)
 
 
-    '''
-    Name column:
-        - Here we split the 'Name' column for extracting the brand and 
-          then the product.
-    '''  
+   
 name = df['Name'].str.split(' ', n = 1, expand = True)
 
 df['Brand'] = name[0]
@@ -89,14 +71,6 @@ df['Product'] = name[1].str.split('Dual Core| Hexa Core| Quad Core| Core',
                                   expand = True)[0]
 
 
-    '''
-    Changing the 'Processor' column:
-        - We will first extract the more frequent processor types from the 
-          Processor column to create a new one;  
-        - then it will be created a new column with the core type;
-        - endly, it will be created a new column informing the processors
-          generation.
-    '''
 prc_type = ['Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core i9',
             'AMD Ryzen 3', 'AMD Ryzen 5', 'AMD Ryzen 7', 'AMD Ryzen 9']
 
@@ -124,28 +98,17 @@ for i in range(len(df)):
             df['ProcessorGen'][i] = str(j)+'th'
 
 
-    '''
-    Rearranging the 'RAM' column by extracting just the number in its entries.
-    '''
+    
 df['RAM'] = df['RAM'].str.split(' ', expand = True)[0]
 
 df['RAM'] = df['RAM'].astype(int)  
 
-    '''
-    The RAM of the 390th entry was not inserted in its equivalent column. This
-    information, 8 GB, is seen in the 'Name' column.
-    '''
+  
 df['RAM'][df['RAM'] == 'Upgradable'] = 8
 
 df['RAM'] = df['RAM'].astype(int)
 
-
-    '''
-    Operating System Information:
-        This attribute will be reduced to three: 'Windows', 'Mac' and 'Other
-        OS'. The latter will be used in case the Operating System is not one
-        of the formers, dicarding the rest of information of this column.
-    '''      
+   
 df['OpSys'] = ''
 
 for k in range(len(df)):
@@ -156,14 +119,7 @@ for k in range(len(df)):
     else:
        df['OpSys'][k] = 'Other OS' 
        
-       
-    '''
-    Organizing the 'Storage' column:
-        - For this step The 'TB' unit will first be replaced by '1000 GB';
-        - it will then be extracted just the numeric part of the storage
-          information;
-        - lastly, this column will be split to differ 'HDD' from 'SSD' storage.
-    '''
+   
 df['Storage'] = df['Storage'].replace('1 TB', '1000 GB', regex = True)
 
 Storage = df['Storage'].str.split('|', expand = True)
@@ -188,23 +144,13 @@ df['SSD Storage'] = df['SSD Storage'].str.split('GB', expand = True)[0]
 
 df['SSD Storage'] = df['SSD Storage'].fillna(0).astype(int)
    
-    '''
-    The storage of the 201st entry was not properly iserted. The correct value,
-    1 TB (1000 GB), was taken from the 'Name' column.
-    '''
+    
 df['SSD Storage'][df['SSD Storage'] == 'M.2 Slot for SSD Upgrade'] = 1000
 
 df['SSD Storage'] = df['SSD Storage'].fillna(0).astype(int)
 
 
-  '''
-   Display column:
-        - We first replace the records with the Display lenght in 'inch'  to
-          'cm';
-        - the Display information not recorder in 'cm' is replaced by 'other';
-        - ultimately, the rest of information is discarded, by splitting the
-        Display column by 'cm'.
-    '''
+  
 df['Display'] = df['Display'].replace('15.6 inches', '39.62 cm', regex = True)
 
 for i in range(len(df)):
@@ -214,11 +160,6 @@ for i in range(len(df)):
 df['Display'] = df['Display'].str.split('cm', expand = True)[0]
 
 
-    '''
-     Warranty column:
-          - for this step, we simply split the term 'Year' and 'Months',
-          discarding the rest of information.
-      '''
 df['Warranty'] = df['Warranty'].replace('One-year', '1 Year', regex = True)
 
 for i in range(len(df)):
@@ -234,17 +175,9 @@ for i in range(len(df)):
        df['Warranty'][i] =  df['Warranty'][i] + ' Year'
 
 
-    '''
-    Organizing the 'Price' column:
-        - On the following code, we replace the '₹' currency symbol
-          and, lastly, ',' to white space.
-    '''  
 df['Price'] = df['Price'].replace(['₹', ','], '', regex = True).astype(float)
 
 
-    '''
-    Concatenating the clean data in a new dataset.
-    '''
 df_ltp = pd.concat([df['Brand'], df['Product'], df['ProcessorType'],
                   df['ProcessorCore'], df['ProcessorGen'], df['RAM'],
                   df['OpSys'], df['HDD Storage'], df['SSD Storage'], 
@@ -258,26 +191,15 @@ df_ltp = pd.concat([df['Brand'], df['Product'], df['ProcessorType'],
 
 
 
-    '''
-    Main statistical parameters of the explanatory and target variables.
-    '''
 df_ltp.describe().iloc[:,:-1]
 
 df_ltp.describe()['Price']
 
 
-     '''
-     Presenting the entries overall information, such as type and missing
-     values. As can be noticed by running the code below, at this point,
-     everything seems right.
-     '''
 df_ltp.info()
 
 
-    '''
-    Distribution plots.
-    '''
-
+  
 numeric_vls = list(df_ltp.describe().columns)
 
 for i in numeric_vls:
@@ -286,9 +208,7 @@ for i in numeric_vls:
     pp.savefig ('{0}_displot.png'.format(i))
     pp.close()
 
-    '''
-    KDE plots.
-    '''
+    
 for j in numeric_vls:
     pp.figure()
     sb.set(rc = {'figure.figsize':(16,10)}, font_scale = 2)
@@ -296,15 +216,7 @@ for j in numeric_vls:
     pp.savefig ('{0}_kdeplot.png'.format(j))
     pp.close()
 
-   
-    '''
-    How the laptop price varies? To answer this question, will be adopted the
-    following approach:
-        - For all the attributes, excepting the 'Rating, it will be used the
-          bar plot to ilustrate this variation;
-        - for the 'Rating' entries will be used a strip plot. Prior to this
-          step, for the other numeric attributes will be used the scatter plot.
-    '''
+ 
 brplt_vars = ['Brand']+list(df_ltp.columns)[2:-2]
 
 for j in brplt_vars:
@@ -326,9 +238,6 @@ pp.savefig("Rating_stripplot.png")
 pp.close()
 
 
-  '''
-  Correlation heatmap.
-  '''
 sb.heatmap(df_ltp.corr(), annot=True)
 pp.savefig("correlation_heatmap.png")
 pp.close()
@@ -336,19 +245,6 @@ pp.close()
 
 
 
-""" LAPTOP PRICE PREDICTION MODEL """
-
-    '''
-    To build the ML model it is vital to first encode the categorical entries.
-    Then, we'll normalize, scale and reduce the dimensionality of these
-    attributes.
-    
-    We next create a function to apply Robust Scaler and RFE (only for Ridge,
-    XGB and Linear Regression, since Lasso eliminates features as part of its 
-    regularization procedure). We train and fit the model with this same 
-    function. The outcome is a tuple containing the metrics of each model (MSE
-    and R2) and the predicted model itself.
-    '''
 
 X, y = pd.get_dummies(df_ltp.iloc[:,:-1],
                       drop_first = True), df_ltp.iloc[:,-1]
@@ -421,9 +317,7 @@ def check_model(X, y, model):
                         
     return mse_model, r2_model, final_model
 
-    '''
-    We next create a dataframe which stores the metrics of each model
-    '''
+  
 XGB_metrics = check_model(X, y, XGB)[:-1]
 LinReg_metrics = check_model(X, y, LinReg)[:-1]
 Lasso_metrics = check_model(X, y, Lasso)[:-1]
@@ -431,22 +325,13 @@ Ridge_metrics = check_model(X, y, Ridge)[:-1]
 
 df_metrics = pd.DataFrame([XGB_metrics, LinReg_metrics, Lasso_metrics,
                            Ridge_metrics], columns=['MSE', 'R2'], index = ['XGB', 'Linear Regression',
-                                                                           'Lasso', 'Ridge'])
-        '''
-        From the dataframe dispayed above, it is noticed that Ridge has the 
-        highest R2 score (69.12%) and the lowest MSE (5.08e+08), outperforming
-        the other three models. We'll next save this model using joblib, import
-        it and deploy as a Web App with Gradio.
-        '''
+      
 mse, r2, model = check_model(X, y, Ridge)
 
-
-    ''' SAVING THE MODEL ''' 
 
 jbl.dump(model,"LaptopPriceModel.sav")
 
 
-    ''' MODEL PELOYMENT '''
     
 def predict(Brand, Product, ProcessorType, ProcessorCore,
                       ProcessorGen, RAM, Opsys, HDD_Storage,
@@ -460,10 +345,6 @@ def predict(Brand, Product, ProcessorType, ProcessorCore,
         return outcome
 
 
-
-    ''' 
-    Setting the inputs
-    '''
 brand = gd.Textbox(label = "Enter the brand of the laptop")
 product = gd.Textbox(label = "Enter the product type")
 processortype = gd.Textbox(label = "Enter the processor type")
@@ -477,21 +358,13 @@ display = gd.Textbox(label = "Enter the Display")
 warranty = gd.Textbox(label = "Enter the Warranty")
 rating = gd.Number(label = "Enter the Rating")
 
-        '''
-        Creating the output
-        '''
 Price = gd.Number()
 
-    '''
-    Defining the web app interface
-    '''
 webapp = gd.Interface(fn = predict, inputs = [brand, product, processortype, processorcore,
                                               processorgen, ram,  opsys,
                                               hddstorage, ssdstorage, display,
-                                              warranty, rating], outputs = Price)
-    '''
-    Launching the web app
-    '''
+
 webapp.launch(share = 'True')
 ______________________________________________END_____________________________________________
+
 
